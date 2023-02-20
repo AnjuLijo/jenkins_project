@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+    environment {
+        dockerhub=credentials('dockerhub')
+    }
+    stages {
+        stage('git_checckout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/AnjuLijo/jenkins_project.git'
+            }
+        }
+        stage('Docker_build') {
+            steps {
+                sh 'docker build -t test .'
+            }
+        }
+        stage('Dockerimages') {
+            steps {
+                sh 'docker images'
+            }
+        }
+        stage('Docker_push') {
+            steps {
+                sh 'docker tag test anjulijo/jenkins:v1'
+                sh 'docker login -u $dockerhub_USR -p $dockerhub_PSW'
+                sh 'docker push anjulijo/jenkins:v1'
+            }
+        }
+       
+    }
+}
